@@ -49,8 +49,11 @@ Nested VM Setup:
 1. Install virt-manager
 
 $ sudo apt-get install virt-manager 
+
 $ sudo apt-get install libvirt-bin libvirt-doc 
+
 $ sudo apt-get install qemu-system 
+
 $ sudo virt-manager
 
 2. Download Ubuntu iso image 
