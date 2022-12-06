@@ -35,6 +35,9 @@ EXPORT_SYMBOL_GPL(kvm_cpu_caps);
 //javeed
 atomic64_t exits_number = ATOMIC64_INIT(0);
 EXPORT_SYMBOL(exits_number);
+//vinay
+atomic64_t duration_exits = ATOMIC64_INIT(0);
+EXPORT_SYMBOL(duration_exits);
 
 static u32 xstate_required_size(u64 xstate_bv, bool compacted)
 {
@@ -1246,7 +1249,21 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 		
 	}
 	//javeed end
+	
+	//vinay code start
+	else if(eax==0x4ffffffd){
 
+		kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, true);	
+		ebx = ((atomic64_read(&duration_exits)>>32));
+		printk("eax = 0x4FFFFFFd \n ebx = %u", ebx);
+		ecx = (atomic64_read(&duration_exits) & 0xffffffff);
+		printk("eax = 0x4ffffffd \n ecx = %u", ecx);
+	
+	}
+	else{
+	kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);
+	}
+       //vinay code end
 
 	kvm_rax_write(vcpu, eax);
 	kvm_rbx_write(vcpu, ebx);
