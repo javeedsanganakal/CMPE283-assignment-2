@@ -71,6 +71,8 @@ MODULE_LICENSE("GPL");
 
 //javeed
 extern atomic64_t exits_number;
+//vinay
+extern atomic64_t duration_exits;
 
 
 #ifdef MODULE
@@ -5943,6 +5945,8 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 		vcpu->run->fail_entry.hardware_entry_failure_reason
 			= exit_reason.full;
 		vcpu->run->fail_entry.cpu = vcpu->arch.last_vmentry_cpu;
+		//vinay
+		atomic64_add(rdtsc() - start_time, &duration_exits);
 		
 		return 0;
 	}
@@ -6035,8 +6039,8 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 						kvm_vmx_max_exit_handlers);
 	if (!kvm_vmx_exit_handlers[exit_handler_index])
 		goto unexpected_vmexit;
-
-
+	//vinay
+	atomic64_add(rdtsc() - start_time, &duration_exits);
 	return kvm_vmx_exit_handlers[exit_handler_index](vcpu);
 
 unexpected_vmexit:
@@ -6049,7 +6053,8 @@ unexpected_vmexit:
 	vcpu->run->internal.ndata = 2;
 	vcpu->run->internal.data[0] = exit_reason.full;
 	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
-	
+	//vinay
+	atomic64_add(rdtsc() - start_time, &duration_exits);
 	return 0;
 }
 
